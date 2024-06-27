@@ -51,6 +51,27 @@ app.get('/Campaign', (req, res) => {
         return res.json({ Campaign: data });
     });
 });
+app.get('/dyn_creatives', (req, res) => {
+    const q = 'SELECT * FROM dyn_creatives';
+    db.query(q, (err, data) => {
+        if (err) {
+            console.error('Error fetching data:', err);
+            return res.status(500).json({ error: 'Database query error' });
+        }
+        return res.json({ Campaign: data });
+    });
+});
+
+app.get('/bot_clicks', (req, res) => {
+    const q = 'SELECT * FROM bot_clicks';
+    db.query(q, (err, data) => {
+        if (err) {
+            console.error('Error fetching data:', err);
+            return res.status(500).json({ error: 'Database query error' });
+        }
+        return res.json({ Campaign: data });
+    });
+});
 
 app.get('/columns/:table', (req, res) => {
     const table = req.params.table;
@@ -61,6 +82,28 @@ app.get('/columns/:table', (req, res) => {
             return res.status(500).json({ error: 'Database query error' });
         }
         return res.json({ columns: data.map(col => col.Field) });
+    });
+});
+
+app.post('/dyn_creatives', (req, res) => {
+    const { adv_id, config_status, match_rate, sorg_status, pixel_status } = req.body;
+    const query = 'INSERT INTO dyn_creatives (adv_id, config_status, match_rate, sorg_status, pixel_status) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [adv_id, config_status, match_rate, sorg_status, pixel_status], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database insertion error', details: err });
+        }
+        res.status(201).json({ message: 'Data inserted successfully', data: req.body });
+    });
+});
+
+app.post('/bot_clicks', (req, res) => {
+    const { adv_eid, adv_name, click_type, click, click_share } = req.body;
+    const query = 'INSERT INTO bot_clicks (adv_eid, adv_name, click_type, click, click_share) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [adv_eid, adv_name, click_type, click, click_share], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database insertion error', details: err });
+        }
+        res.status(201).json({ message: 'Data inserted successfully', data: req.body });
     });
 });
 
